@@ -1,9 +1,9 @@
-# VK Video Live — search vkvideo.ru, watch with translated captions **and dubbing**
+# VK Video Live — paste a link, get captions in your language
 
-A single-page site that lets you **search VK Video (vkvideo.ru) in any Indian language**
-and watch the result with captions **and spoken audio** translated into your language —
+Paste a **VK Video link** or a **direct video file**, pick a language, and the site plays
+the video with **live captions**, a **timed transcript** and optional **spoken dubbing** in
 English, Hindi, Marathi, Gujarati, Bengali, Tamil, Telugu, Kannada, Malayalam, Punjabi,
-Odia, Assamese, Urdu.
+Odia, Assamese or Urdu.
 
 Free, unlimited and open source: the dubbing runs on your own device, and the translation
 can run on a model you host yourself.
@@ -12,120 +12,100 @@ Live demo (GitHub Pages): **https://swami-prathmesh.github.io/vk-video-live/**
 
 ---
 
-## What it does
+## What happens when you paste a link
 
-1. You type a query in **your** language. The site sends it to a small backend.
-2. The backend translates the query **into Russian**, calls `video.search` on the VK API,
-   and translates the titles back into your language.
-3. When you open a video it pulls the audio, runs speech-to-text on the Russian speech,
-   and translates every cue into your chosen language, with timings attached.
-4. The browser plays the video, highlights each cue as it plays, and — if you press
-   **Dub audio** — speaks the translated line in your language while the original audio
-   is muted. That is the Instagram-style dubbing, done on-device.
+1. The link is parsed in the browser: `vkvideo.ru/video-123_456`, `vk.com/video-123_456`,
+   `vk.com/video_ext.php?oid=…&id=…`, or any URL ending in `.mp4`, `.webm`, `.m4v`, `.m3u8`.
+2. The worker resolves it to a playable stream, sends the Russian audio to speech-to-text,
+   and gets word-level timings back.
+3. Each line is translated into your language and **streamed to the page as it is ready**,
+   so captions start appearing within a few seconds instead of after the whole video.
+4. The page plays the video, highlights the line being spoken, and builds the transcript.
+   Press **Dub audio** and the same lines are spoken aloud on your device.
 
 ```
-browser  --(query in your language)-->  worker
-worker   --(query in Russian)-------->  VK video.search
-worker   --(results + captions)------>  browser
-browser  --(speaks the dub locally)-->  your ears
+browser  --(link + language)-->  worker
+worker   --(audio -> text)---->  speech-to-text
+worker   --(text -> your lang)-> translation model
+worker   --(cues, one by one)--> browser  (server-sent events)
+browser  --(speaks the dub)--->  your speakers
 ```
 
 ---
 
 ## Free and unlimited — how
 
-| Layer | Free path | Paid alternative |
-|---|---|---|
-| **Dubbing (TTS)** | The browser's built-in speech engine (`speechSynthesis`). No server, no key, no quota, works offline. | Sarvam / ElevenLabs for studio-quality voices |
-| **Translation (MT)** | Self-host `server/` — Meta **NLLB-200** or AI4Bharat **IndicTrans2**, both open weights. Your machine, unlimited characters. | Sarvam AI, Google, Yandex |
-| **Speech-to-text** | Self-host faster-whisper (or Whisper large-v3) next to the MT server | Sarvam `speech-to-text-translate` |
-| **Hosting** | GitHub Pages (static) + Cloudflare Workers free tier (100k req/day) | — |
-| **VK search** | VK API with a free app token | — |
+**Dubbing.** The browser's own speech engine speaks each translated cue over the muted
+video. No server, no key, no quota, works offline.
 
-Nothing in the free path meters you. The only cost is the machine you run the models on:
-the 600M NLLB model runs on a laptop CPU, faster-whisper `small` runs on CPU too.
+**Translation.** Self-host `server/` — Meta **NLLB-200** or AI4Bharat **IndicTrans2**, both
+open weights, 14 languages including Russian. Your machine, unlimited characters. Point the
+worker at it with `MT_BASE` and every translation is free.
 
-**Quality, honestly:** browser voices are clear but robotic — think 2015 GPS, not a human
-voice actor. NLLB is good for Indian languages, weaker than IndicTrans2 on Hindi/Marathi/
-Bengali nuance. If you want broadcast quality, swap the TTS for Sarvam's `/text-to-speech`
-and keep everything else identical.
+**Speech-to-text.** Swap `transcribeAudio()` for a self-hosted faster-whisper service when
+you want the last paid dependency gone; the function is the only place that touches STT.
 
----
+**Hosting.** GitHub Pages for the site, Cloudflare Workers free tier for the API.
 
-## What works out of the box
-
-| | Demo mode (default) | Live mode |
-|---|---|---|
-| Search UI, results grid, player | ✅ | ✅ |
-| 14 caption languages, live switching | ✅ pre-translated sample | ✅ machine translated |
-| Captions synced to playback | ✅ | ✅ when a direct file is returned |
-| **Dub audio (spoken translation)** | ✅ | ✅ |
-| Real vkvideo.ru results | — | needs `VK_ACCESS_TOKEN` |
-| Real translation | — | needs `MT_BASE` or `SARVAM_API_KEY` |
+**Quality, honestly.** Browser voices are clear but robotic — a good GPS, not a voice actor.
+NLLB is solid for Indian languages; IndicTrans2 is better on Hindi, Marathi and Bengali
+nuance. For broadcast quality, swap the TTS for a neural voice service and keep everything
+else identical.
 
 ---
 
-## Going live
+## Quick start
 
-**1. Self-host the translator (free, unlimited).** In the `server/` folder, install the
-requirements with pip, then start the service with `uvicorn app:app --host 0.0.0.0
---port 8080`. It exposes `POST /translate` and `POST /translate-batch` for all 14
-languages, including Russian. Set `MT_MODEL` to `ai4bharat/indictrans2-indic-en-dist-200M`
-if you would rather run IndicTrans2.
+Out of the box the site runs in **demo mode**: paste one of the sample clip links and the
+full experience works — player, 14 languages, captions, transcript, downloads, dubbing —
+using captions that ship with the site.
 
-**2. Deploy the worker.** In the `worker/` folder run `wrangler login` and then
-`wrangler deploy`. Add your keys as worker secrets: `VK_ACCESS_TOKEN`, and `MT_BASE`
-pointing at the server above — that is the free, unlimited path. If you skip `MT_BASE`,
-also add `SARVAM_API_KEY` and either `GOOGLE_TRANSLATE_KEY` or `YANDEX_TRANSLATE_KEY`
-for the Russian leg. `curl <worker-url>/api/health` tells you which ones are wired up.
+To go live, deploy `worker/` with wrangler, add the secrets `VK_ACCESS_TOKEN` and `MT_BASE`
+(or `SARVAM_API_KEY`), then set `API_BASE` in `assets/js/config.js` to the worker URL and
+push. `curl <worker-url>/api/health` reports which pieces are wired up.
 
-**3. Point the site at it.** Set `API_BASE` in `assets/js/config.js` to the worker URL,
-commit and push. GitHub Pages redeploys on its own.
+To run the translator: install `server/requirements.txt`, start `server/app.py` with
+uvicorn on port 8080, and set `MT_BASE` to that address.
 
 ---
 
 ## Project layout
 
 ```
-index.html                  the whole app shell
-assets/css/styles.css       styling (dark, VK-blue accent)
+index.html                  app shell: link bar, player, caption panel
+assets/css/styles.css       dark UI, VK-blue accent
 assets/js/config.js         ← the only file you edit to go live
-assets/js/langs.js          14 caption languages + quick searches
+assets/js/langs.js          14 caption languages
 assets/js/i18n.js           UI strings: English, Hindi, Marathi, Russian
-assets/js/demo.js           demo catalogue used when API_BASE is empty
+assets/js/demo.js           sample clip links for demo mode
 assets/js/demo-captions.js  demo cues pre-translated into all 14 languages
-assets/js/app.js            search, player, caption sync, on-device dubbing
-worker/src/index.js         Cloudflare Worker: /api/search, /api/captions, /api/translate
+assets/js/app.js            link parsing, player, live captions, transcript, dubbing
+worker/src/index.js         Worker: /api/transcript (SSE), /api/search, /api/translate
 server/app.py               self-hosted NLLB-200 translation (free, unlimited)
 ```
 
 ## API
 
 ```
-GET  /api/search?q=मॉस्को&lang=hi
-GET  /api/captions?oid=-12345&id=456239017&lang=mr
+GET  /api/transcript?url=<link>&lang=hi&stream=1     server-sent events: meta, cue, done
+GET  /api/transcript?url=<link>&lang=hi              same as one JSON object
 POST /api/translate   {"text":"Привет","from":"ru","to":"gu"}
 GET  /api/health
 ```
 
 ## Known limits
 
-- **Dubbing needs the direct stream.** The `<video>` element is muted and the speech
-  engine speaks each cue. Videos that only play inside the VK iframe cannot be dubbed,
-  because the page cannot control that player — captions still work there.
-- **Voices are whatever your device has.** Android, Windows and macOS ship Indian-language
-  voices; some desktop Linux and browsers ship only English. The panel tells you when a
-  voice is missing and where to install one.
-- **A long cue can overrun the next one.** Speech is cancelled and restarted at each cue
-  boundary, which is how live dubbing behaves; a time-stretched dub would need pre-rendered
-  audio.
-- **Transcription is per-video, not per-second.** The worker transcribes first, then returns
-  timed cues; on a long video the first cues take a few seconds. True streaming ASR needs a
-  WebSocket worker — the endpoint is isolated in `transcribeAudio()`.
-- **Worker memory** — download the smallest rendition (`mp4_240`) for transcription; very
-  long videos may need chunked uploads.
-- Respect VK's terms and the rights of the video owners; this uses the official API only.
+- **Videos that only play in VK's iframe** cannot be time-synced: the embed does not expose
+  playback position to the page. The transcript still arrives in order; captions and dubbing
+  need a direct stream, which the worker returns whenever VK offers one.
+- **Voices come from your device.** Android, Windows and macOS ship Indian-language voices;
+  some Linux browsers ship English only. The panel says so and tells you where to add one.
+- **A long cue can overrun the next one** — speech restarts at each cue boundary, which is
+  how live dubbing behaves everywhere.
+- **Worker memory.** The worker downloads the smallest rendition (`mp4_240`) to transcribe;
+  very long videos may need chunked uploads.
+- Respect VK's terms and the rights of the video owners. This uses the official API only.
 
 ## License
 
-MIT — see `LICENSE`. The models (NLLB-200, IndicTrans2, Whisper) keep their own licences.
+MIT — see `LICENSE`. The models keep their own licences.
