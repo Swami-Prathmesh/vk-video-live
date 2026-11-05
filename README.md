@@ -51,3 +51,16 @@ Bengali nuance. If you want broadcast quality, swap the TTS for Sarvam's `/text-
 and keep everything else identical.
 
 ---
+
+## What works out of the box
+
+| | Demo mode (default) | Live mode |
+|---|---|---|
+| Search UI, results grid, player | ✅ | ✅ |
+| 14 caption languages, live switching | ✅ pre-translated sample | ✅ machine translated |
+| Captions synced to playback | ✅ | ✅ when a direct file is returned |
+| **Dub audio (spoken translation)** | ✅ | ✅ |
+| Real vkvideo.ru results | — | needs `VK_ACCESS_TOKEN` |
+| Real translation | — | needs `MT_BASE` or `SARVAM_API_KEY` |
+
+---
