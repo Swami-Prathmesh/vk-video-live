@@ -1,59 +1,22 @@
-/* Demo catalogue — used only when CONFIG.API_BASE is empty.
-   In live mode the same object shape comes from the worker's /api/search. */
-window.DEMO_CATALOGUE = [
+/* Sample links shown under the input in demo mode (no worker connected).
+   Each one is a direct video file, so it plays and captions work offline. */
+window.SAMPLE_LINKS = [
   {
-    id: "demo-1",
-    oid: null,
-    title: "Тест: живой перевод видео на индийские языки",
-    titleEn: "Test: live video translation into Indian languages",
-    channel: "VK Video Демо",
-    duration: 15,
-    tags: ["перевод", "translation", "тест", "test", "язык", "language"],
-    mp4: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4",
-    lang: "ru",
+    label: "Sample clip · 15s",
+    url: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4",
+    title: "Demo clip — translated live",
+    duration: 15
   },
   {
-    id: "demo-2",
-    oid: null,
-    title: "Москва: зимняя прогулка по Красной площади",
-    titleEn: "Moscow: a winter walk across Red Square",
-    channel: "Русские прогулки",
-    duration: 15,
-    tags: ["москва", "moscow", "путешествие", "travel", "россия", "russia"],
-    mp4: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerEscapes.mp4",
-    lang: "ru",
+    label: "Sample clip · cooking",
+    url: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerFun.mp4",
+    title: "Demo clip — kitchen",
+    duration: 15
   },
   {
-    id: "demo-3",
-    oid: null,
-    title: "Русская кухня: готовим борщ дома",
-    titleEn: "Russian kitchen: making borscht at home",
-    channel: "Вкусно и просто",
-    duration: 15,
-    tags: ["еда", "food", "рецепт", "recipe", "борщ", "borscht", "кухня"],
-    mp4: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerFun.mp4",
-    lang: "ru",
-  },
-  {
-    id: "demo-4",
-    oid: null,
-    title: "Учим русский язык: первые сто слов",
-    titleEn: "Learning Russian: the first hundred words",
-    channel: "Русский для всех",
-    duration: 15,
-    tags: ["русский", "russian", "язык", "language", "урок", "lesson", "शिक्षा"],
-    mp4: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerJoyrides.mp4",
-    lang: "ru",
-  },
-  {
-    id: "demo-5",
-    oid: null,
-    title: "Новости технологий: нейросети и перевод речи",
-    titleEn: "Tech news: neural networks and speech translation",
-    channel: "Техно Обзор",
-    duration: 15,
-    tags: ["новости", "news", "технологии", "tech", "нейросети", "ai", "перевод"],
-    mp4: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerMeltdowns.mp4",
-    lang: "ru",
-  },
+    label: "Sample clip · travel",
+    url: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerEscapes.mp4",
+    title: "Demo clip — travel",
+    duration: 15
+  }
 ];
