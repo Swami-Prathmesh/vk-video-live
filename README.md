@@ -88,3 +88,21 @@ GET  /api/captions?oid=-12345&id=456239017&lang=mr
 POST /api/translate   {"text":"Привет","from":"ru","to":"gu"}
 GET  /api/health
 ```
+
+## Known limits
+
+- **Dubbing needs the direct stream.** The `<video>` element is muted and the speech
+  engine speaks each cue. Videos that only play inside the VK iframe cannot be dubbed,
+  because the page cannot control that player — captions still work there.
+- **Voices are whatever your device has.** Android, Windows and macOS ship Indian-language
+  voices; some desktop Linux and browsers ship only English. The panel tells you when a
+  voice is missing and where to install one.
+- **A long cue can overrun the next one.** Speech is cancelled and restarted at each cue
+  boundary, which is how live dubbing behaves; a time-stretched dub would need pre-rendered
+  audio.
+- **Transcription is per-video, not per-second.** The worker transcribes first, then returns
+  timed cues; on a long video the first cues take a few seconds. True streaming ASR needs a
+  WebSocket worker — the endpoint is isolated in `transcribeAudio()`.
+- **Worker memory** — download the smallest rendition (`mp4_240`) for transcription; very
+  long videos may need chunked uploads.
+- Respect VK's terms and the rights of the video owners; this uses the official API only.
