@@ -106,3 +106,7 @@ GET  /api/health
 - **Worker memory** — download the smallest rendition (`mp4_240`) for transcription; very
   long videos may need chunked uploads.
 - Respect VK's terms and the rights of the video owners; this uses the official API only.
+
+## License
+
+MIT — see `LICENSE`. The models (NLLB-200, IndicTrans2, Whisper) keep their own licences.
