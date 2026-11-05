@@ -31,3 +31,23 @@ browser  --(speaks the dub locally)-->  your ears
 ```
 
 ---
+
+## Free and unlimited — how
+
+| Layer | Free path | Paid alternative |
+|---|---|---|
+| **Dubbing (TTS)** | The browser's built-in speech engine (`speechSynthesis`). No server, no key, no quota, works offline. | Sarvam / ElevenLabs for studio-quality voices |
+| **Translation (MT)** | Self-host `server/` — Meta **NLLB-200** or AI4Bharat **IndicTrans2**, both open weights. Your machine, unlimited characters. | Sarvam AI, Google, Yandex |
+| **Speech-to-text** | Self-host faster-whisper (or Whisper large-v3) next to the MT server | Sarvam `speech-to-text-translate` |
+| **Hosting** | GitHub Pages (static) + Cloudflare Workers free tier (100k req/day) | — |
+| **VK search** | VK API with a free app token | — |
+
+Nothing in the free path meters you. The only cost is the machine you run the models on:
+the 600M NLLB model runs on a laptop CPU, faster-whisper `small` runs on CPU too.
+
+**Quality, honestly:** browser voices are clear but robotic — think 2015 GPS, not a human
+voice actor. NLLB is good for Indian languages, weaker than IndicTrans2 on Hindi/Marathi/
+Bengali nuance. If you want broadcast quality, swap the TTS for Sarvam's `/text-to-speech`
+and keep everything else identical.
+
+---
