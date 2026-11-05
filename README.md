@@ -64,3 +64,18 @@ and keep everything else identical.
 | Real translation | — | needs `MT_BASE` or `SARVAM_API_KEY` |
 
 ---
+
+## Project layout
+
+```
+index.html                  the whole app shell
+assets/css/styles.css       styling (dark, VK-blue accent)
+assets/js/config.js         ← the only file you edit to go live
+assets/js/langs.js          14 caption languages + quick searches
+assets/js/i18n.js           UI strings: English, Hindi, Marathi, Russian
+assets/js/demo.js           demo catalogue used when API_BASE is empty
+assets/js/demo-captions.js  demo cues pre-translated into all 14 languages
+assets/js/app.js            search, player, caption sync, on-device dubbing
+worker/src/index.js         Cloudflare Worker: /api/search, /api/captions, /api/translate
+server/app.py               self-hosted NLLB-200 translation (free, unlimited)
+```
