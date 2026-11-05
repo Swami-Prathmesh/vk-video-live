@@ -3,8 +3,8 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>VK Video Live — search in any Indian language, watch with translated captions</title>
-<meta name="description" content="Search VK Video (vkvideo.ru) in English, Hindi, Marathi, Gujarati, Tamil, Telugu or Bengali. Your query is translated to Russian, and the video plays with captions translated live into your language." />
+<title>VK Video Live — paste a video link, get captions in your language</title>
+<meta name="description" content="Paste a VK Video link or a direct video file and get live captions, a full transcript and optional spoken dubbing in English, Hindi, Marathi, Gujarati, Tamil, Telugu, Bengali and more." />
 <link rel="stylesheet" href="assets/css/styles.css" />
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='22' fill='%230077ff'/><path d='M38 28 L74 50 L38 72 Z' fill='white'/></svg>" />
 </head>
@@ -23,32 +23,35 @@
 </header>
 
 <main>
-  <!-- ============ SEARCH VIEW ============ -->
-  <section id="searchView" class="view">
+  <!-- ============ HOME: paste a link ============ -->
+  <section id="homeView" class="view">
     <div class="hero">
-      <h1 data-i18n="heroTitle">Search VK Video. Watch with live translated captions.</h1>
-      <p class="hero-sub" data-i18n="heroSub">Type in English, Hindi, Marathi or any Indian language. We translate your query into Russian, search vkvideo.ru, and translate the video's captions back into the language you chose.</p>
+      <h1 data-i18n="heroTitle">Paste a video link. Get captions in your language.</h1>
+      <p class="hero-sub" data-i18n="heroSub">Any VK Video link or a direct video file. We transcribe the Russian audio and translate every line into the language you pick — live captions, a full transcript, and optional spoken dubbing.</p>
 
-      <form class="searchbar" id="searchForm" autocomplete="off">
-        <svg class="search-ico" viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M16.5 16.5 L21 21"/></svg>
-        <input id="q" type="search" data-i18n-placeholder="searchPlaceholder" placeholder="Search videos in any language…" />
-        <button type="submit" id="searchBtn" data-i18n="searchBtn">Search</button>
+      <form class="searchbar linkbar" id="linkForm" autocomplete="off">
+        <svg class="search-ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M10 13a5 5 0 0 0 7 0l3-3a5 5 0 0 0-7-7l-1.5 1.5"/><path d="M14 11a5 5 0 0 0-7 0l-3 3a5 5 0 0 0 7 7L12.5 19.5"/></svg>
+        <input id="url" type="text" inputmode="url" spellcheck="false"
+               data-i18n-placeholder="linkPlaceholder"
+               placeholder="Paste a link — vkvideo.ru/video-123_456 or https://…/movie.mp4" />
+        <select id="heroLang" class="mini-select hero-lang" aria-label="Caption language"></select>
+        <button type="submit" id="goBtn" data-i18n="generate">Generate</button>
       </form>
 
-      <div class="chips" id="quickChips"></div>
-    </div>
+      <div class="err" id="homeError" hidden></div>
+      <div class="chips" id="sampleChips"></div>
 
-    <div class="results-head">
-      <h2 id="resultsTitle" data-i18n="resultsTitle">Trending picks</h2>
-      <span class="count" id="resultsCount"></span>
+      <ul class="feature-strip">
+        <li><strong data-i18n="f1t">Live captions</strong><span data-i18n="f1s">Every line translated and highlighted as the video plays.</span></li>
+        <li><strong data-i18n="f2t">Full transcript</strong><span data-i18n="f2s">Timed transcript in your language, one click to download.</span></li>
+        <li><strong data-i18n="f3t">Spoken dubbing</strong><span data-i18n="f3s">Hear the translation in your language, on your own device.</span></li>
+      </ul>
     </div>
-    <div class="grid" id="grid"></div>
-    <p class="empty" id="emptyState" hidden data-i18n="noResults">Nothing found. Try a different word.</p>
   </section>
 
-  <!-- ============ WATCH VIEW ============ -->
+  <!-- ============ WATCH ============ -->
   <section id="watchView" class="view" hidden>
-    <button class="back" id="backBtn"><span>←</span> <span data-i18n="back">Back to results</span></button>
+    <button class="back" id="backBtn"><span>←</span> <span data-i18n="back">New link</span></button>
 
     <div class="watch">
       <div class="player-col">
@@ -66,9 +69,13 @@
 
       <aside class="captions">
         <div class="captions-head">
-          <h3 data-i18n="capTitle">Live captions</h3>
+          <div class="tabs" role="tablist">
+            <button class="tab active" id="tabCaptions" data-tab="captions" data-i18n="tabCaptions">Captions</button>
+            <button class="tab" id="tabTranscript" data-tab="transcript" data-i18n="tabTranscript">Transcript</button>
+          </div>
           <select id="langSelect" class="mini-select" aria-label="Caption language"></select>
         </div>
+
         <div class="dub-bar">
           <button id="dubBtn" class="dub-btn" type="button" aria-pressed="false">
             <span class="dub-ico" aria-hidden="true"></span>
@@ -77,9 +84,18 @@
           <select id="voiceSelect" class="mini-select" aria-label="Dub voice"></select>
         </div>
         <div class="dub-note" id="dubNote" hidden></div>
+
         <div class="cap-status" id="capStatus"></div>
+
         <ol class="cue-list" id="cueList"></ol>
-        <div class="cap-foot" id="capFoot"></div>
+        <div class="transcript-pane" id="transcriptPane" hidden>
+          <p id="transcriptText"></p>
+        </div>
+
+        <div class="cap-foot">
+          <button class="mini-btn" id="dlTxt" data-i18n="dlTxt">Download .txt</button>
+          <button class="mini-btn" id="dlSrt" data-i18n="dlSrt">Download .srt</button>
+        </div>
       </aside>
     </div>
   </section>
