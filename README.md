@@ -79,3 +79,12 @@ assets/js/app.js            search, player, caption sync, on-device dubbing
 worker/src/index.js         Cloudflare Worker: /api/search, /api/captions, /api/translate
 server/app.py               self-hosted NLLB-200 translation (free, unlimited)
 ```
+
+## API
+
+```
+GET  /api/search?q=मॉस्को&lang=hi
+GET  /api/captions?oid=-12345&id=456239017&lang=mr
+POST /api/translate   {"text":"Привет","from":"ru","to":"gu"}
+GET  /api/health
+```
