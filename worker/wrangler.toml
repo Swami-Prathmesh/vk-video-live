@@ -1,0 +1,15 @@
+name = "vk-video-live-api"
+main = "src/index.js"
+compatibility_date = "2025-01-01"
+
+# Free plan is enough for a preview: 100k requests/day.
+# Add your keys as secrets, never in this file:
+#   wrangler secret put VK_ACCESS_TOKEN
+#   wrangler secret put SARVAM_API_KEY
+#   wrangler secret put GOOGLE_TRANSLATE_KEY
+#   wrangler secret put YANDEX_TRANSLATE_KEY
+
+[vars]
+# Optional: restrict the browser origins allowed to call the worker.
+# Left open here because GitHub Pages serves from <user>.github.io.
+ALLOWED_ORIGIN = "*"
