@@ -65,6 +65,25 @@ and keep everything else identical.
 
 ---
 
+## Going live
+
+**1. Self-host the translator (free, unlimited).** In the `server/` folder, install the
+requirements with pip, then start the service with `uvicorn app:app --host 0.0.0.0
+--port 8080`. It exposes `POST /translate` and `POST /translate-batch` for all 14
+languages, including Russian. Set `MT_MODEL` to `ai4bharat/indictrans2-indic-en-dist-200M`
+if you would rather run IndicTrans2.
+
+**2. Deploy the worker.** In the `worker/` folder run `wrangler login` and then
+`wrangler deploy`. Add your keys as worker secrets: `VK_ACCESS_TOKEN`, and `MT_BASE`
+pointing at the server above — that is the free, unlimited path. If you skip `MT_BASE`,
+also add `SARVAM_API_KEY` and either `GOOGLE_TRANSLATE_KEY` or `YANDEX_TRANSLATE_KEY`
+for the Russian leg. `curl <worker-url>/api/health` tells you which ones are wired up.
+
+**3. Point the site at it.** Set `API_BASE` in `assets/js/config.js` to the worker URL,
+commit and push. GitHub Pages redeploys on its own.
+
+---
+
 ## Project layout
 
 ```
